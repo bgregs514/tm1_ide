@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'none'; script-src file: 'unsafe-inline'; style-src 'unsafe-inline' file:; font-src file:"
+		/>
+		<title>TM1 Editor: A sensible, no-bs rule/TI editor</title>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+
+	<body>
+		<div style="display: flex; height: 100%">
+			<div id="sidebar">Cube List</div>
+			<div id="container"></div>
+		</div>
+	</body>
+
+	<!-- This a hack to get around the monaco loader.js "require" taking precedence over the nodeJS "require" -->
+	<script>
+		var nodeRequire = global.require;
+	</script>
+	<script src="./node_modules/monaco-editor/min/vs/loader.js"></script>
+	<script>
+		var amdRequire = global.require;
+		global.require = nodeRequire;
+	</script>
+	<script src="js/monaco.js"></script>
+</html>

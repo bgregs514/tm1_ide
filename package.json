@@ -1,0 +1,16 @@
+{
+  "name": "ElectronTest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^10.1.5",
+    "monaco-editor": "^0.21.2"
+  }
+}
