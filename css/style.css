@@ -1,3 +1,6 @@
+@import url('../node_modules/@fortawesome/fontawesome-free/css/all.min.css');
+
+/* Tags */
 html {
     height: 100%;
     width: 100%;
@@ -7,17 +10,73 @@ body {
     width: 100%;
     overflow-y: hidden;
     overflow-x: hidden;
+    background-color: #121212;
 }
+hr {
+    border-top: 1px solid;
+    opacity: .1;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    margin-left: 35px;
+    margin-right: 14px;
+}
+
+/* classes */
+.cubeElement {
+    box-sizing: border-box;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.cubeElement i {
+    color: #03DAC6;
+    float: left;
+    width: 25px;
+    height: 25px;
+    margin-left: 10px;
+}
+.cubeElement p {
+    color: #BB86FC;
+    margin: 0;
+    padding-left: 25px;
+}
+.cubeElement:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.selectedCubeElement {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* IDs */
 #sidebar {
     position: relative;
     width: calc(20% - 8px);
     height: calc(100% - 8px);
-    border: 1px solid #ccc;
+    background-color: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+#sidebar:hover {
+    overflow-y: overlay;
+    overflow-x: hidden;
+}
+#sidebar::-webkit-scrollbar {
+    width: 14px;
+}
+#sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
 }
 #container {
     position: relative;
     flex-grow: 1;
     height: calc(100% - 8px);
-    border: 1px solid #ccc;
     margin-right: 16px;
+}
+#title {
+    color: #BB86FC;
+    font-weight: bold;
+    font-size: 25px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-top: 10px;
+    margin: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }

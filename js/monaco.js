@@ -1,4 +1,5 @@
 const langRule = require('./js/langRule');
+var editor;
 
 window.amdRequire.config({ paths: { vs: './node_modules/monaco-editor/min/vs' } });
 window.amdRequire(['vs/editor/editor.main'], function () {
@@ -16,7 +17,7 @@ window.amdRequire(['vs/editor/editor.main'], function () {
 		triggerCharacters:['.']
 	});
 
-	const editor = monaco.editor.create(document.getElementById('container'), {
+	editor = monaco.editor.create(document.getElementById('container'), {
 		value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
 		language: 'langRule',
 		scrollBeyondLastLine: false,

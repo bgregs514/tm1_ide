@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src 'none'; script-src file: 'unsafe-inline'; style-src 'unsafe-inline' file:; font-src file:"
+			content="default-src 'none'; script-src file: 'unsafe-inline'; style-src 'unsafe-inline' file:; img-src 'self'; font-src file:"
 		/>
 		<title>TM1 Editor: A sensible, no-bs rule/TI editor</title>
 		<link rel="stylesheet" href="css/style.css">
@@ -12,7 +12,9 @@
 
 	<body>
 		<div style="display: flex; height: 100%">
-			<div id="sidebar">Cube List</div>
+			<div id="sidebar">
+				<ul id=title>Cube List</ul>
+			</div>
 			<div id="container"></div>
 		</div>
 	</body>
@@ -27,4 +29,5 @@
 		global.require = nodeRequire;
 	</script>
 	<script src="js/monaco.js"></script>
+	<script src="js/renderer.js"></script>
 </html>
