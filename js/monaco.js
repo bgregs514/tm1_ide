@@ -17,7 +17,7 @@ window.amdRequire(['vs/editor/editor.main'], function () {
 		triggerCharacters:['.']
 	});
 
-	editor = monaco.editor.create(document.getElementById('container'), {
+	editor = monaco.editor.create(document.getElementById('mainContainer'), {
 		value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
 		language: 'langRule',
 		scrollBeyondLastLine: false,

@@ -12,6 +12,7 @@
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
     "electron": "^10.1.5",
+    "electron-storage": "^1.0.7",
     "monaco-editor": "^0.21.2"
   }
 }

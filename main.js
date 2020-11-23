@@ -1,25 +1,67 @@
 const {app, BrowserWindow, Menu, MenuItem, dialog, net, ipcMain} = require('electron');
+const storage = require('electron-storage');
+
+/* Configuration Variables */
+var gConfigPath = './configuration.json';
+var gConfigData = {
+	AdminHost: 'Enter Admin Host',
+	HTTPPort: 'Enter HTTP Port',
+	Username: 'Enter Username',
+	Password: 'Enter Password'
+};
+
+var gAdminHost = '';
+var gPort = '';
+var gUser = '';
+var gPass = '';
+/* ----------------------- */
+
+/* Context Menu */
+var gCM;
+/* ----------------------- */
 
 function createWindow() {
-	const win = new BrowserWindow({
+	const winMain = new BrowserWindow({
 		width: 1200,
 		height: 800,
 		webPreferences: {
 			nodeIntegration: true
 		}
 	});
-	const configWin = new BrowserWindow({
+	const winConfig = new BrowserWindow({
 		width: 800,
 		height: 600,
-		parent: win,
+		parent: winMain,
 		modal: true,
 		show: false
 	});
+	const winHier = new BrowserWindow({
+		width: 1000,
+		height: 800,
+		parent: winMain,
+		modal: false,
+		show: false,
+		webPreferences: {
+			nodeIntegration: true
+		}
+	});
 
-	//win.addListener('resize', resizeEditor);
-
-	win.loadFile('index.html');
+	winMain.loadFile('index.html');
+	winHier.loadFile('windows/hierarchies.html');
+	
+	/* Debug lines */
 	//win.webContents.openDevTools();
+	winHier.webContents.openDevTools();
+
+	/* Prevent child windows from being destroyed on close */
+	winConfig.addListener('close', (event) => {
+		event.preventDefault();
+		winConfig.hide();
+	});
+	winHier.addListener('close', (event) => {
+		event.preventDefault();
+		winHier.hide();
+	});
 
 	const menuTemplate = [
 		{
@@ -28,7 +70,7 @@ function createWindow() {
 				{
 					label: 'Save',
 					click() {
-						win.webContents.send('save-cube-rule');
+						winMain.webContents.send('save-cube-rule');
 					}
 				}
 			]
@@ -39,7 +81,7 @@ function createWindow() {
 				{
 					label: 'Configuration',
 					click() {
-						configWin.show();
+						winConfig.show();
 					}
 				}
 			]
@@ -48,20 +90,53 @@ function createWindow() {
 			label: 'View',
 			submenu: [
 				{
-					role: 'zoomin'
-				},
-				{
-					role: 'zoomout'
+					label: 'Hierarchies',
+					click() {
+						winHier.show();
+					}
 				}
 			]
 		}
-	]
+	];
+
+	const cmTemplate = [
+		{
+			label: 'Delete Element',
+			click: () => {
+				alert('Are you sure you want to delete this element?');
+			}
+		},
+		{
+			type: 'separator'
+		}
+	];
+	gCM = Menu.buildFromTemplate(cmTemplate);
+
+	const mHierTemplate = [
+		{
+			label: 'File',
+			submenu: [
+				{
+					label: 'Display Settings',
+					click() {
+						//winHier.show();
+						console.log('show menu');
+					}
+				}
+			]
+		}
+	];
+	const mHier = Menu.buildFromTemplate(mHierTemplate);
+	winHier.setMenu(mHier);
 
 	const menu = Menu.buildFromTemplate(menuTemplate);
-	Menu.setApplicationMenu(menu);
+	winMain.setMenu(menu);
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+	getConfigs();
+	createWindow();
+});
 
 app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') {
@@ -78,102 +153,92 @@ app.on('activate', () => {
 // This is bad and needs to be fixed, but the CN is wrong in the dev cert
 app.commandLine.appendSwitch('ignore-certificate-errors');
 
+function getConfigs()
+{
+	storage.isPathExists(gConfigPath, (success) => {
+		if (success) {
+			storage.get(gConfigPath).then(data => {
+				//console.log(data);
+				gAdminHost = data.AdminHost;
+				gPort = data.HTTPPort;
+				gUser = data.Username;
+				gPass = data.Password;
+			}).catch(err => {
+				console.log(err);
+			});
+		} else {
+			console.log('path does not exist.');
+			storage.set(gConfigPath, JSON.stringify(gConfigData));
+		}
+	});
+}
+
 /* ipcRenderer Messages */
 
 ipcMain.on('get-cube-list', (event, arg) => {
-	var jsonObj = '';
-	//console.log("I'm in");
-	const options = {
-		method: 'GET',
-		protocol: 'https:',
-		hostname: 'usher7873.usdev.deloitte.com',
-		port: 45642,
-		path: '/api/v1/Cubes?$select=Name',
-	};
-	const req = net.request(options, res => {
-		console.log(`statusCode: ${res.statusCode}`);
-
-		res.on('data', chunk => {
-			jsonObj += chunk;
-			//console.log(`BODY: ${jsonObject}`);
-		});
-		res.on('end', () => {
-			jsonObj = JSON.parse(jsonObj);
-			event.reply('get-cube-list', jsonObj);
-		});
-	});
-	req.setHeader('Content-Type', 'application/json');
-	req.on('login', (authInfo, callback) => {
-		callback('bengregory', 'Bsg051493@');
-	});
-	req.on('error', error => { 
-		console.log(`ERROR: ${error}`);
-	});
-	req.end();
+	path = '/api/v1/Cubes?$select=Name';
+	tm1Request(event, 'GET', path, '', 'get-cube-list');
 });
 
 ipcMain.on('get-cube-rule', (event, arg) => {
-	var jsonObj = '';
-	//console.log("I'm in");
-	const options = {
-		method: 'GET',
-		protocol: 'https:',
-		hostname: 'usher7873.usdev.deloitte.com',
-		port: 45642,
-		path: '/api/v1/Cubes(\'' + arg + '\')?$select=Rules',
-	};
-	const req = net.request(options, res => {
-		console.log(`statusCode: ${res.statusCode}`);
-
-		res.on('data', chunk => {
-			jsonObj += chunk;
-			//console.log(`BODY: ${jsonObject}`);
-		});
-		res.on('end', () => {
-			jsonObj = JSON.parse(jsonObj);
-			event.reply('get-cube-rule', jsonObj);
-		});
-	});
-	req.setHeader('Content-Type', 'application/json');
-	req.on('login', (authInfo, callback) => {
-		callback('bengregory', 'Bsg051493@');
-	});
-	req.on('error', error => { 
-		console.log(`ERROR: ${error}`);
-	});
-	req.end();
+	path = '/api/v1/Cubes(\'' + arg + '\')?$select=Rules';
+	tm1Request(event, 'GET', path, '', 'get-cube-rule');
 });
 
 ipcMain.on('save-cube-rule', (event, cubeName, data) => {
-	//console.log("hello");
+	path = '/api/v1/Cubes(\'' + cubeName + '\')';
+	tm1Request(event, 'PATCH', path, data, 'get-cube-rule');
+});
+
+ipcMain.on('get-dimension-list', (event) => {
+	path = '/api/v1/Dimensions?$select=Name';
+	tm1Request(event, 'GET', path, '', 'get-dimension-list');
+});
+
+ipcMain.on('get-dimension-hiers', (event, arg) => {
+	path = '/api/v1/Dimensions(\'' + arg + '\')/Hierarchies?$select=Name';
+	tm1Request(event, 'GET', path, '', 'get-dimension-hiers');
+});
+
+ipcMain.on('get-dimension-els', (event, dimension, hierarchy) => {
+	path = '/api/v1/Dimensions(\'' + dimension + '\')/Hierarchies(\'' + hierarchy + '\')?$expand=Elements($select=Name)';
+	tm1Request(event, 'GET', path, '', 'get-dimension-els');
+});
+
+function tm1Request (event, reqType, strPath, data, strReply)
+{
 	var jsonObj = '';
-	//console.log("I'm in");
 	const options = {
-		method: 'PATCH',
+		method: reqType,
 		protocol: 'https:',
-		hostname: 'usher7873.usdev.deloitte.com',
-		port: 45642,
-		path: '/api/v1/Cubes(\'' + cubeName + '\')',
+		hostname: gAdminHost,
+		port: gPort,
+		path: strPath,
 	};
 	const req = net.request(options, res => {
 		console.log(`statusCode: ${res.statusCode}`);
 
 		res.on('data', chunk => {
 			jsonObj += chunk;
-			//console.log(`BODY: ${jsonObject}`);
 		});
 		res.on('end', () => {
 			jsonObj = JSON.parse(jsonObj);
-			event.reply('get-cube-rule', jsonObj);
+			event.reply(strReply, jsonObj);
 		});
 	});
 	req.setHeader('Content-Type', 'application/json');
 	req.on('login', (authInfo, callback) => {
-		callback('bengregory', 'Bsg051493@');
+		callback(gUser, gPass);
 	});
 	req.on('error', error => { 
 		console.log(`ERROR: ${error}`);
 	});
-	req.write(data);
+	if (data) {
+		req.write(data);
+	}
 	req.end();
+}
+
+ipcMain.on('get-element-cm', () => {
+	gCM.popup();
 });

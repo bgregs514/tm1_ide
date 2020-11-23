@@ -3,15 +3,15 @@ const {app, dialog, net, ipcRenderer} = require('electron');
 /* Global - use sparingly */
 var glbSelectedCube;
 
-ipcRenderer.send('get-cube-list', 'hello');
+ipcRenderer.send('get-cube-list');
 
 ipcRenderer.on('get-cube-list', (event, arg) => {
 	//console.log("got it");
-	cubeListDiv = document.querySelector('div[id=sidebar]');
+	cubeListDiv = document.querySelector('div[id=mainSidebar]');
 	var cubeID = '';
 	for(var i = 0; i < arg.value.length; i++) {
 		//console.log(arg.value[i].Name);
-		cubeListDiv.insertAdjacentHTML('beforeend', '<div id=cube_' + i + ' class=cubeElement></div>');
+		cubeListDiv.insertAdjacentHTML('beforeend', '<div id=cube_' + i + ' class=tm1Element></div>');
 		cubeListDiv.insertAdjacentHTML('beforeend', '<hr>');
 		//console.log(arg.value[i].Name);
 		cubeID = document.getElementById('cube_' + i);
@@ -45,10 +45,10 @@ function cubeClicked()
 	//console.log('clicked: ' + this.querySelector('div p').innerHTML);
 	//removeClassFromAll('cubeElement', 'selectedCubeElement');
 	if (glbSelectedCube) {
-		glbSelectedCube.classList.remove('selectedCubeElement');
+		glbSelectedCube.classList.remove('selectedTM1Element');
 	}
 
-	this.classList.add('selectedCubeElement');
+	this.classList.add('selectedTM1Element');
 	glbSelectedCube = this;
 
 	ipcRenderer.send('get-cube-rule', encodeURIComponent(glbSelectedCube.querySelector('div p').innerHTML.trim()));
