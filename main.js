@@ -7,13 +7,18 @@ var gConfigData = {
 	AdminHost: 'Enter Admin Host',
 	HTTPPort: 'Enter HTTP Port',
 	Username: 'Enter Username',
-	Password: 'Enter Password'
+	Password: 'Enter Password',
+	CAM: 0,
+	Namespace: 'Enter Namespace'
 };
 
 var gAdminHost = '';
 var gPort = '';
 var gUser = '';
 var gPass = '';
+var gCAM = '';
+var gNamespace = '';
+var gEncodedCreds = '';
 /* ----------------------- */
 
 /* Context Menu */
@@ -50,7 +55,7 @@ function createWindow() {
 	winHier.loadFile('windows/hierarchies.html');
 	
 	/* Debug lines */
-	//win.webContents.openDevTools();
+	winMain.webContents.openDevTools();
 	winHier.webContents.openDevTools();
 
 	/* Prevent child windows from being destroyed on close */
@@ -163,6 +168,12 @@ function getConfigs()
 				gPort = data.HTTPPort;
 				gUser = data.Username;
 				gPass = data.Password;
+				gCAM = data.CAM;
+				gNamespace = data.Namespace;
+
+				if (gCAM = 1) {
+					gEncodedCreds = 'CAMNamespace ' + Buffer.from(gUser + ':' + gPass + ':' + gNamespace).toString('base64');
+                }
 			}).catch(err => {
 				console.log(err);
 			});
@@ -176,7 +187,8 @@ function getConfigs()
 /* ipcRenderer Messages */
 
 ipcMain.on('get-cube-list', (event, arg) => {
-	path = '/api/v1/Cubes?$select=Name';
+	//path = '/api/v1/Cubes?$select=Name';
+	path = '/api/v1/Cubes?$select=Name,Rules';
 	tm1Request(event, 'GET', path, '', 'get-cube-list');
 });
 
@@ -227,9 +239,15 @@ function tm1Request (event, reqType, strPath, data, strReply)
 		});
 	});
 	req.setHeader('Content-Type', 'application/json');
-	req.on('login', (authInfo, callback) => {
-		callback(gUser, gPass);
-	});
+
+	/* Set the proper authorization header for CAM, use Basic authentication if not applicable */
+	if (gCAM = 1) {
+		req.setHeader('Authorization', gEncodedCreds);
+	} else {
+		req.on('login', (authInfo, callback) => {
+			callback(gUser, gPass);
+		});
+	}
 	req.on('error', error => { 
 		console.log(`ERROR: ${error}`);
 	});

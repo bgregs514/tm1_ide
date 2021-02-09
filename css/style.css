@@ -37,7 +37,9 @@ hr {
 .tm1Element p {
     color: #BB86FC;
     margin: 0;
-    padding-left: 25px;
+    /*padding-left: 25px;*/
+    word-wrap: break-word;
+    display: inline-block;
 }
 .tm1Element:hover {
     background-color: rgba(255, 255, 255, 0.1);
@@ -84,17 +86,28 @@ hr {
     background-color: azure;
     margin-top: auto;
 }
-
-/* IDs */
-#title {
+.titleBar {
     color: #BB86FC;
     font-weight: bold;
     font-size: 25px;
-    padding-bottom: 10px;
-    padding-left: 10px;
-    padding-top: 10px;
+    width: calc(20% - 14px);
+    height: calc(100%);
+    padding: 0, 0, 0, 0;
+    display: -webkit-box;
+    -webkit-box-align: end;
+}
+
+/* IDs */
+#title {
+    /*padding-bottom: 10px;*/
+    padding-left: 2px;
+    /*padding-top: 10px;*/
     margin: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /*border-bottom: 1px solid rgba(255, 255, 255, 0.1);*/
+}
+#cubeName {
+    flex-grow: 1;
+    padding-left: 6px;
 }
 #hierSidebarH {
     margin-left: 2%;
