@@ -2,12 +2,13 @@ const {app, dialog, net, ipcRenderer} = require('electron');
 
 /* Global - use sparingly */
 var g_SelectedCube;
+const g_IconCount = 2;
 
 ipcRenderer.send('get-cube-list');
 
 ipcRenderer.on('get-cube-list', (event, arg) => {
 	//console.log("got it");
-	console.log(arg);
+	//console.log(arg);
 	cubeListDiv = document.querySelector('div[id=mainSidebar]');
 	var cubeID = '';
 
@@ -21,33 +22,25 @@ ipcRenderer.on('get-cube-list', (event, arg) => {
 		//console.log(arg.value[i].Name);
 		cubeListDiv.insertAdjacentHTML('beforeend', '<div id=cube_' + i + ' class=tm1Element></div>');
 		cubeListDiv.insertAdjacentHTML('beforeend', '<hr>');
-		//console.log(arg.value[i].Name);
+
+		/* Add all tags to the new tm1Element objects */
 		cubeID = document.getElementById('cube_' + i);
-		//for (i = 0; i < 2; i++)
-		//	cubeID.insertAdjacentHTML('beforeend', '<i></i>');
-		cubeID.insertAdjacentHTML('beforeend', '<i class="fas fa-cube"></i>');
-		cubeID.insertAdjacentHTML('beforeend', '<i class="fas fa-file-code"></i>');
-		if (!arg.value[i].Rules)
-			document.querySelectorAll('div[id=cube_' + i + '] > i')[1].style.visibility = 'hidden';
+		/* Add all available icon slots for spacing */
+		for (var j = 0; j < g_IconCount; j++) {
+			cubeID.insertAdjacentHTML('beforeend', '<i></i>');
+		}
 		cubeID.insertAdjacentHTML('beforeend', '<p>' + arg.value[i].Name + '</p>');
 		cubeID.insertAdjacentHTML('beforeend', '<span style="display:none;">' + arg.value[i].Rules + '</span>');
+
+		/* Assign icons; only add code file icon if rule is present */
+		document.querySelectorAll('div[id=cube_' + i + '] > i')[0].classList.add('fas', 'fa-cube');
+		if (arg.value[i].Rules)
+			document.querySelectorAll('div[id=cube_' + i + '] > i')[1].classList.add('fas', 'fa-file-code');
+
 		//console.log(cubeID);
 		cubeID.addEventListener('click', cubeClicked);
 	};
 });
-
-//ipcRenderer.on('get-cube-rule', (event, arg) => {
-//	//console.log(arg.Rules);
-
-//	/* Error on null rule return */
-//	if (!arg.Rules) {
-//		console.log("Rule does not exist!");
-//		return;
-//	}
-
-//	document.querySelector('div[id=cubeName]').innerHTML = g_SelectedCube.querySelector('div p').innerHTML.trim();
-//	editor.setValue(arg.Rules);
-//});
 
 ipcRenderer.on('save-cube-rule', (event, arg) => {
 	ruleCode = editor.getValue();
@@ -62,14 +55,8 @@ ipcRenderer.on('save-cube-rule', (event, arg) => {
 
 function cubeClicked()
 {
-	//console.log('clicked: ' + this.querySelector['div p'].innerHTML);
-	//console.log('clicked: ' + this.querySelector('div p').innerHTML);
-	//removeClassFromAll('cubeElement', 'selectedCubeElement');
-
-	//ipcRenderer.send('get-cube-rule', encodeURIComponent(this.querySelector('div p').innerHTML.trim()));
-
-	rule = this.querySelector('div span').innerHTML;
-	//console.log(rule);
+	ruleTag = this.querySelector('div span');
+	rule = ruleTag.textContent;
 	if (rule == "null")
 		return;
 

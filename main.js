@@ -55,7 +55,7 @@ function createWindow() {
 	winHier.loadFile('windows/hierarchies.html');
 	
 	/* Debug lines */
-	winMain.webContents.openDevTools();
+	//winMain.webContents.openDevTools();
 	winHier.webContents.openDevTools();
 
 	/* Prevent child windows from being destroyed on close */

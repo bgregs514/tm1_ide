@@ -37,9 +37,6 @@ hr {
 .tm1Element p {
     color: #BB86FC;
     margin: 0;
-    /*padding-left: 25px;*/
-    word-wrap: break-word;
-    display: inline-block;
 }
 .tm1Element:hover {
     background-color: rgba(255, 255, 255, 0.1);
@@ -99,11 +96,8 @@ hr {
 
 /* IDs */
 #title {
-    /*padding-bottom: 10px;*/
     padding-left: 2px;
-    /*padding-top: 10px;*/
     margin: 0;
-    /*border-bottom: 1px solid rgba(255, 255, 255, 0.1);*/
 }
 #cubeName {
     flex-grow: 1;
