@@ -21,6 +21,9 @@ hr {
     margin-left: 35px;
     margin-right: 14px;
 }
+p {
+    cursor: default;
+}
 
 /* classes */
 .tm1Element {

@@ -200,14 +200,14 @@ ipcMain.on('get-cube-list', (event, arg) => {
 });
 
 /* Leaving this for now, we may need it later for a "refresh" event or something */
-//ipcMain.on('get-cube-rule', (event, arg) => {
-//	path = '/api/v1/Cubes(\'' + arg + '\')?$select=Rules';
-//	tm1Request(event, 'GET', path, '', 'get-cube-rule');
-//});
+ipcMain.on('get-cube-rule', (event, arg) => {
+	path = '/api/v1/Cubes(\'' + arg + '\')?$select=Rules';
+	tm1Request(event, 'GET', path, '', 'get-cube-rule');
+});
 
 ipcMain.on('save-cube-rule', (event, cubeName, data) => {
 	path = '/api/v1/Cubes(\'' + cubeName + '\')';
-	tm1Request(event, 'PATCH', path, data, 'get-cube-rule');
+	tm1Request(event, 'PATCH', path, data, 'refresh-cube-rule');
 });
 
 ipcMain.on('get-dimension-list', (event) => {
@@ -257,7 +257,8 @@ function tm1Request (event, reqType, strPath, data, strReply)
 		});
 	}
 	req.on('error', error => { 
-		console.log(`ERROR: ${error}`);
+		//console.log(`ERROR: ${error}`);
+		ThrowError("Error", error);
 	});
 	if (data) {
 		req.write(data);

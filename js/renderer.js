@@ -1,10 +1,14 @@
 const { ipcRenderer } = require('electron');
-const { Notification } = require('electron').remote;
 
-/* Global - use sparingly */
+/*****************************************
+ * Globals - Use sparingly
+ ****************************************/
 var g_SelectedCube;
 const g_IconCount = 2;
 
+/*****************************************
+ * ipcRenderer Messages
+ ****************************************/
 ipcRenderer.send('get-cube-list');
 
 ipcRenderer.on('get-cube-list', (event, arg) => {
@@ -39,7 +43,24 @@ ipcRenderer.on('get-cube-list', (event, arg) => {
 	};
 });
 
+ipcRenderer.on('refresh-cube-rule', (event, arg) => {
+	setRule(arg.Rules);
+	setEditor(arg.Rules);
+
+	/* TODO: This is a hack, see below note for more details */
+	document.body.style.pointerEvents = "auto";
+	/* Display success notification */
+	n_RuleSaveSuccess.show();
+});
+
 ipcRenderer.on('save-cube-rule', (event, arg) => {
+	/* TODO: This is a lazy hack to disable clicks so the setRule() function doesn't
+	 * assign the rule to a different tmeElement's span tag - which does happen if a user
+	 * clicks a different tm1Element before the save has completed and the g_SelectedCube variable
+	 * has been updated.  The proper approach is to pass the cube name that the save is being performed on to the
+	 * setRule() and setEditor() functions instead of relying on g_SelectedCube, but this is a placeholder for now. */
+	document.body.style.pointerEvents = "none";
+
 	ruleCode = editor.getValue();
 
 	data = {
@@ -50,6 +71,12 @@ ipcRenderer.on('save-cube-rule', (event, arg) => {
 	ipcRenderer.send('save-cube-rule', encodeURIComponent(g_SelectedCube.querySelector('div p').innerHTML.trim()), data);
 });
 
+/*****************************************
+ * Standard Functions
+ ****************************************/
+/*
+ * Handles the assignment of global variables when a cube is clicked
+ */
 function cubeClicked()
 {
 	ruleTag = this.querySelector('div span');
@@ -62,40 +89,45 @@ function cubeClicked()
 	this.classList.add('selectedTM1Element');
 	g_SelectedCube = this;
 
-	setRule(rule);
+	setEditor(rule);
 }
 
-function setRule(rule)
+/*
+ * Sets the title bar elements (Cube Name and Status), and assigns the rule text to
+ * the Monaco editor
+ */
+function setEditor(rule)
 {
 	/* Set the cube name in the title bar */
 	titleBar_cubeName = document.querySelector('div[id=titleBar_cubeName]');
 	titleBar_cubeName.innerHTML = g_SelectedCube.querySelector('div p').innerHTML.trim();
 	titleBar_status.innerHTML = "";
 
-	if (rule == "null") {
+	/* 3 different possible states that the rule could be in while still being empty...awesome */
+	if (rule === "null" || rule === "" || rule === null) {
+		/* Remove the rule icon */
+		g_SelectedCube.querySelectorAll('i')[1].classList.remove('fas', 'fa-file-code');
+
 		/* Assign the title bar status */
 		titleBar_status = document.querySelector('div[id=titleBar_status]');
 		titleBar_status.innerHTML = "NEW";
 
 		/* Give the rule a basic header comment */
 		rule = "# " + titleBar_cubeName.innerHTML + ".rux";
-	}
+	} else {
+		g_SelectedCube.querySelectorAll('i')[1].classList.add('fas', 'fa-file-code');
+    }
 
 	/* Assign the rule to the Monaco editor */
 	editor.setValue(rule);
 }
 
-/*****************************************
- * Message Boxes
- ****************************************/
-/* INFO: Null rule */
-o_NullRule = {
-	title: "No Rule",
-	body: "There is no rule available for this cube.  Click here to create one.",
-	silent: true
-	//icon: __dirname + '\resources\code.png'
-};
-const n_NullRule = new Notification(o_NullRule);
-n_NullRule.on('click', (event) => {
-	console.log("notification clicked");
-});
+/*
+ * Assigns the rule text to the hidden tm1Element span for quicker access
+ * and reduced network calls
+ */
+function setRule(rule)
+{
+	ruleTag = g_SelectedCube.querySelector('div span');
+	ruleTag.innerHTML = rule;
+}
