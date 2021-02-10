@@ -14,5 +14,8 @@
     "electron": "^10.1.5",
     "electron-storage": "^1.0.7",
     "monaco-editor": "^0.21.2"
+  },
+  "dependencies": {
+    "@fontsource/roboto": "^4.2.0"
   }
 }

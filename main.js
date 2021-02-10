@@ -30,7 +30,8 @@ function createWindow() {
 		width: 1200,
 		height: 800,
 		webPreferences: {
-			nodeIntegration: true
+			nodeIntegration: true,
+			enableRemoteModule: true
 		}
 	});
 	const winConfig = new BrowserWindow({
@@ -53,10 +54,14 @@ function createWindow() {
 
 	winMain.loadFile('index.html');
 	winHier.loadFile('windows/hierarchies.html');
-	
-	/* Debug lines */
-	//winMain.webContents.openDevTools();
-	winHier.webContents.openDevTools();
+
+
+	/****************************************
+	* Debug lines
+	*****************************************/
+	//winMain.webContents.openDevTools();	//
+	//winHier.webContents.openDevTools();	//
+	/****************************************/
 
 	/* Prevent child windows from being destroyed on close */
 	winConfig.addListener('close', (event) => {
@@ -184,7 +189,9 @@ function getConfigs()
 	});
 }
 
-/* ipcRenderer Messages */
+/*****************************************
+ * ipcRenderer Messages
+ ****************************************/
 
 ipcMain.on('get-cube-list', (event, arg) => {
 	//path = '/api/v1/Cubes?$select=Name';
@@ -192,10 +199,11 @@ ipcMain.on('get-cube-list', (event, arg) => {
 	tm1Request(event, 'GET', path, '', 'get-cube-list');
 });
 
-ipcMain.on('get-cube-rule', (event, arg) => {
-	path = '/api/v1/Cubes(\'' + arg + '\')?$select=Rules';
-	tm1Request(event, 'GET', path, '', 'get-cube-rule');
-});
+/* Leaving this for now, we may need it later for a "refresh" event or something */
+//ipcMain.on('get-cube-rule', (event, arg) => {
+//	path = '/api/v1/Cubes(\'' + arg + '\')?$select=Rules';
+//	tm1Request(event, 'GET', path, '', 'get-cube-rule');
+//});
 
 ipcMain.on('save-cube-rule', (event, cubeName, data) => {
 	path = '/api/v1/Cubes(\'' + cubeName + '\')';

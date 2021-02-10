@@ -1,4 +1,5 @@
-const {app, dialog, net, ipcRenderer} = require('electron');
+const { ipcRenderer } = require('electron');
+const { Notification } = require('electron').remote;
 
 /* Global - use sparingly */
 var g_SelectedCube;
@@ -7,8 +8,6 @@ const g_IconCount = 2;
 ipcRenderer.send('get-cube-list');
 
 ipcRenderer.on('get-cube-list', (event, arg) => {
-	//console.log("got it");
-	//console.log(arg);
 	cubeListDiv = document.querySelector('div[id=mainSidebar]');
 	var cubeID = '';
 
@@ -19,7 +18,6 @@ ipcRenderer.on('get-cube-list', (event, arg) => {
     }
 	
 	for(var i = 0; i < arg.value.length; i++) {
-		//console.log(arg.value[i].Name);
 		cubeListDiv.insertAdjacentHTML('beforeend', '<div id=cube_' + i + ' class=tm1Element></div>');
 		cubeListDiv.insertAdjacentHTML('beforeend', '<hr>');
 
@@ -37,7 +35,6 @@ ipcRenderer.on('get-cube-list', (event, arg) => {
 		if (arg.value[i].Rules)
 			document.querySelectorAll('div[id=cube_' + i + '] > i')[1].classList.add('fas', 'fa-file-code');
 
-		//console.log(cubeID);
 		cubeID.addEventListener('click', cubeClicked);
 	};
 });
@@ -49,7 +46,7 @@ ipcRenderer.on('save-cube-rule', (event, arg) => {
 		Rules: ruleCode
 	};
 	data = JSON.stringify(data);
-	//console.log(data);
+
 	ipcRenderer.send('save-cube-rule', encodeURIComponent(g_SelectedCube.querySelector('div p').innerHTML.trim()), data);
 });
 
@@ -57,8 +54,6 @@ function cubeClicked()
 {
 	ruleTag = this.querySelector('div span');
 	rule = ruleTag.textContent;
-	if (rule == "null")
-		return;
 
 	if (g_SelectedCube) {
 		g_SelectedCube.classList.remove('selectedTM1Element');
@@ -73,7 +68,34 @@ function cubeClicked()
 function setRule(rule)
 {
 	/* Set the cube name in the title bar */
-	document.querySelector('div[id=cubeName]').innerHTML = g_SelectedCube.querySelector('div p').innerHTML.trim();
+	titleBar_cubeName = document.querySelector('div[id=titleBar_cubeName]');
+	titleBar_cubeName.innerHTML = g_SelectedCube.querySelector('div p').innerHTML.trim();
+	titleBar_status.innerHTML = "";
+
+	if (rule == "null") {
+		/* Assign the title bar status */
+		titleBar_status = document.querySelector('div[id=titleBar_status]');
+		titleBar_status.innerHTML = "NEW";
+
+		/* Give the rule a basic header comment */
+		rule = "# " + titleBar_cubeName.innerHTML + ".rux";
+	}
+
 	/* Assign the rule to the Monaco editor */
 	editor.setValue(rule);
 }
+
+/*****************************************
+ * Message Boxes
+ ****************************************/
+/* INFO: Null rule */
+o_NullRule = {
+	title: "No Rule",
+	body: "There is no rule available for this cube.  Click here to create one.",
+	silent: true
+	//icon: __dirname + '\resources\code.png'
+};
+const n_NullRule = new Notification(o_NullRule);
+n_NullRule.on('click', (event) => {
+	console.log("notification clicked");
+});

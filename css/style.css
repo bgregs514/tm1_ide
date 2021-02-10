@@ -1,4 +1,5 @@
 @import url('../node_modules/@fortawesome/fontawesome-free/css/all.min.css');
+@import url('../node_modules/@fontsource/roboto/index.css');
 
 /* Tags */
 html {
@@ -50,6 +51,7 @@ hr {
     height: calc(100% - 8px);
     background-color: rgba(255, 255, 255, 0.1);
     overflow: hidden;
+    font-family: 'Roboto';
 }
 .sidebar:hover {
     overflow-y: overlay;
@@ -85,23 +87,25 @@ hr {
 }
 .titleBar {
     color: #BB86FC;
-    font-weight: bold;
+    font-family: 'Roboto';
     font-size: 25px;
-    width: calc(20% - 14px);
-    height: calc(100%);
-    padding: 0, 0, 0, 0;
     display: -webkit-box;
     -webkit-box-align: end;
 }
 
 /* IDs */
-#title {
+#titleBar_title {
     padding-left: 2px;
     margin: 0;
+    width: calc(20% - 14px);
 }
-#cubeName {
+#titleBar_cubeName {
     flex-grow: 1;
     padding-left: 6px;
+}
+#titleBar_status {
+    width: 7%;
+    color: rgba(255, 255, 255, 0.4);
 }
 #hierSidebarH {
     margin-left: 2%;
