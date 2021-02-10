@@ -24,6 +24,7 @@ npm start
 - Desktop push notifications
 - Intellisense
 - Syntax highlighting
+- CAM and Native authentication
 
 # Pending Features
 - TI browsing
