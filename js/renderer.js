@@ -12,6 +12,9 @@ const g_IconCount = 2;
 ipcRenderer.send('get-cube-list');
 
 ipcRenderer.on('get-cube-list', (event, arg) => {
+	/* Disable the loading icon */
+	toggleLoadingIcon(false);
+
 	cubeListDiv = document.querySelector('div[id=mainSidebar]');
 	var cubeID = '';
 
@@ -47,6 +50,8 @@ ipcRenderer.on('refresh-cube-rule', (event, arg) => {
 	setRule(arg.Rules);
 	setEditor(arg.Rules);
 
+	/* Disable the loading icon */
+	toggleLoadingIcon(false);
 	/* TODO: This is a hack, see below note for more details */
 	document.body.style.pointerEvents = "auto";
 	/* Display success notification */
@@ -54,6 +59,7 @@ ipcRenderer.on('refresh-cube-rule', (event, arg) => {
 });
 
 ipcRenderer.on('save-cube-rule', (event, arg) => {
+	toggleLoadingIcon(true);
 	/* TODO: This is a lazy hack to disable clicks so the setRule() function doesn't
 	 * assign the rule to a different tmeElement's span tag - which does happen if a user
 	 * clicks a different tm1Element before the save has completed and the g_SelectedCube variable
@@ -130,4 +136,17 @@ function setRule(rule)
 {
 	ruleTag = g_SelectedCube.querySelector('div span');
 	ruleTag.innerHTML = rule;
+}
+
+/*
+ * Toggles the visibility of the loading icon
+ * display = true -> visible
+ * display = false -> hidden
+ */
+function toggleLoadingIcon(display)
+{
+	if (display)
+		document.getElementById("sideBar_loading").style.display = "inherit";
+	else
+		document.getElementById("sideBar_loading").style.display = "none";
 }

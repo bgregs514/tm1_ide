@@ -118,3 +118,9 @@ p {
     margin-left: 2%;
     visibility: hidden;
 }
+#sideBar_loading {
+    font-size: 50px;
+    position: absolute;
+    z-index: 10;
+    color: rgba(255, 255, 255, 0.4);
+}

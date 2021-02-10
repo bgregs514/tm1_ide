@@ -18,7 +18,10 @@ window.amdRequire(['vs/editor/editor.main'], function () {
 	});
 
 	editor = monaco.editor.create(document.getElementById('mainContainer'), {
-		value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
+		value: ['# Welcome to TM1 Code',
+				'# <== Select a cube on the left to start hacking\n\n',
+				'# To report any issues, please reach out to bgregs on the TM1Forum or submit a bug report on the github page',
+				'# Thank you for supporting the project, proudly made in Austin, TX'].join('\n'),
 		language: 'langRule',
 		scrollBeyondLastLine: false,
 		wordWrap: 'on',
